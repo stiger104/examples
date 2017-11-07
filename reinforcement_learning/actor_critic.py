@@ -11,7 +11,6 @@ import torch.optim as optim
 import torch.autograd as autograd
 from torch.autograd import Variable
 
-
 parser = argparse.ArgumentParser(description='PyTorch actor-critic example')
 parser.add_argument('--gamma', type=float, default=0.99, metavar='G',
                     help='discount factor (default: 0.99)')
@@ -23,13 +22,13 @@ parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                     help='interval between training status logs (default: 10)')
 args = parser.parse_args()
 
-
 env = gym.make('CartPole-v0')
 env.seed(args.seed)
 torch.manual_seed(args.seed)
 
-
 SavedAction = namedtuple('SavedAction', ['action', 'value'])
+
+
 class Policy(nn.Module):
     def __init__(self):
         super(Policy, self).__init__()
@@ -70,7 +69,7 @@ def finish_episode():
     rewards = torch.Tensor(rewards)
     rewards = (rewards - rewards.mean()) / (rewards.std() + np.finfo(np.float32).eps)
     for (action, value), r in zip(saved_actions, rewards):
-        reward = r - value.data[0,0]
+        reward = r - value.data[0, 0]
         action.reinforce(reward)
         value_loss += F.smooth_l1_loss(value, Variable(torch.Tensor([r])))
     optimizer.zero_grad()
@@ -85,9 +84,9 @@ def finish_episode():
 running_reward = 10
 for i_episode in count(1):
     state = env.reset()
-    for t in range(10000): # Don't infinite loop while learning
+    for t in range(10000):  # Don't infinite loop while learning
         action = select_action(state)
-        state, reward, done, _ = env.step(action[0,0])
+        state, reward, done, _ = env.step(action[0, 0])
         if args.render:
             env.render()
         model.rewards.append(reward)
